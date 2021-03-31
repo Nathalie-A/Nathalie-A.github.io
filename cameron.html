@@ -38,10 +38,73 @@
 							<span class="image fit"><img src="images/pic08.jpg" alt="" /></span>
 							<p>"To: Cameron" is a Serious Game in which the players take the role of Cameron, who's grounded without internet access over the whole winter break. Her family doesn't know that the teenager just became aware that she's a lesbian. To keep it that way, Cameron's only chance of talking about her newly found feelings and questions with her friends is through paper plane-letters that her friends sneak into her home at night. She has to find these letters before her parents do.</p>
 							<p><span class="image left"><img src="images/pic05.jpg" alt="" /></span>In this project I coded and designed the UI as well as the scenes that the main menu and the credits are using. The main menu have the options to start the game, go into the settings, quit the game or go to the credits. The start and credits button simply changed the scene, while the quit button uses Unitys "Application.Quit()" method to close the game. More exiting is the setting button, which changes the position of the camera on click before giving the options to control the games sound volume. To match the atmosphere of the game, I decided to give the camera slight movement.</p>
-							<p><span class="image right"><img src="images/pic06.jpg" alt="" /></span>The same camera movement is in the credit scene as well. The scene has two buttons, one that leads back to the main menu and one that raises the speed of the scene by applying as higher speed number on click or goes back to the original speed if clicked again. To make the credits more special the code runs through a coroutine that follows a specific loop: First one of the characters gets moved into the scene along with the UI element, then while giving the players time to read the character is "doing something" within the scene (that can be a sound that's getting played or a game object that's activated/deactivated). Afterwards the character and the UI element move out of the frame.</p>	
-							<p>For better understanding of the UI watch the video underneath or play the game yourself by following this link: https://maybelater.itch.io/tocameron</p>
-							<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/2ooWcPgLiOY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-							<span class="image fit"><img src="images/pic08.jpg" alt="" /></span>
+							<pre><code>private void Update()
+    {
+        //If the bool is true, the camera is slightly moving up and down
+        if (movingCamera)
+        {
+            mainCamera.transform.localPosition = new Vector3(mainCamera.transform.localPosition.x, originalYposition + ((float)Mathf.Sin(Time.realtimeSinceStartup * floatSpeed) * floatHight), mainCamera.transform.localPosition.z);
+        }
+    }</code></pre>
+							<pre><code>private IEnumerator ZoomIn()
+    {
+        //The camera lerps into the new position and the first menu moves aside
+        float startTime = Time.time;
+        while (Time.time < startTime + movementSpeed)
+        {
+            mainCamera.transform.position = Vector3.Lerp(defaultPosition, settingsPosition, (Time.time - startTime) / movementSpeed);
+            mainCamera.transform.rotation = Quaternion.Lerp(defaultRotation, settingRotation, (Time.time - startTime) / movementSpeed);
+                        
+            menuButtons.transform.localPosition = Vector3.Lerp(menuButtonDefault, menuButtonMoveTo, (Time.time - startTime) / movementSpeed);
+            yield return null;
+        }
+        mainCamera.transform.position = settingsPosition;
+        mainCamera.transform.rotation = settingRotation;
+
+        menuButtons.transform.localPosition = menuButtonMoveTo;
+
+        //The setting menu opens
+        settingMenu.SetActive(true);
+    }</code></pre>
+							<p><span class="image right"><iframe src="https://giphy.com/embed/JxTsa1ulsnSQHhPVGv" width="480" height="270" frameBorder="0" class="giphy-embed" allowFullScreen></iframe></span>The same camera movement is in the credit scene as well. The scene has two buttons, one that leads back to the main menu and one that raises the speed of the scene by applying as higher speed number on click or goes back to the original speed if clicked again. To make the credits more special the code runs through a coroutine that follows a specific loop: First one of the characters gets moved into the scene along with the UI element, then while giving the players time to read the character is "doing something" within the scene (that can be a sound that's getting played or a game object that's activated/deactivated). Afterwards the character and the UI element move out of the frame.</p>	
+							<pre><code>(...)
+
+		//second letter moves up and dad walks in
+        startTime = Time.time;
+        while (Time.time < startTime + normalLerpSpeed)
+        {
+            secondLetter.transform.localPosition = Vector3.Lerp(startPosition, onScreenPosition, (Time.time - startTime) / normalLerpSpeed);
+            dadObject.transform.localPosition = Vector3.Lerp(startKI.transform.localPosition, stopKI.transform.localPosition, (Time.time - startTime) / normalLerpSpeed);
+
+            yield return null;
+        }
+        secondLetter.transform.localPosition = onScreenPosition;
+        dadObject.transform.localPosition = stopKI.transform.localPosition;
+
+        //Lightsource gets activated
+        yield return new WaitForSecondsRealtime(2f);
+
+        lightObject.SetActive(true);
+
+        yield return new WaitForSecondsRealtime(2f);
+
+        //second letter moves up, dad leaves
+        startTime = Time.time;
+        while (Time.time < startTime + normalLerpSpeed)
+        {
+            secondLetter.transform.localPosition = Vector3.Lerp(onScreenPosition, endPosition, (Time.time - startTime) / normalLerpSpeed);
+            dadObject.transform.localPosition = Vector3.Lerp(stopKI.transform.localPosition, endKI.transform.localPosition, (Time.time - startTime) / normalLerpSpeed);
+
+            yield return null;
+        }
+        secondLetter.transform.localPosition = endPosition;
+        dadObject.transform.localPosition = endKI.transform.localPosition;
+
+        yield return new WaitForSecondsRealtime(0.5f);
+		
+		(...)</code></pre>
+							<p>For better understanding of the UI watch the video underneath or play the game yourself by following <a href="https://maybelater.itch.io/tocameron">this link.</a></p>
+							<div style="text-align: center;"><iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/2ooWcPgLiOY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
 						</div>
 					</section>
 
